@@ -19,9 +19,9 @@ elif __file__:
 
 # cwd = os.getcwd()
 cwd = application_path
-print()
-print(cwd)
-print()
+# print()
+# print(cwd)
+# print()
 cartsDir = os.path.join(cwd, "Carts")
 
 os.environ["PATH"] += os.pathsep + cwd
@@ -72,7 +72,7 @@ try:
     supplier_input = driver.find_element_by_id("newSupplierSearchId")
     supplier_input.clear()
     supplier_input.send_keys(vendor)
-    time.sleep(1)
+    ui.WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//li[@class='yui-ac-highlight']")))
     supplier_input.send_keys(Keys.RETURN)
 
     fill_in_data = {
@@ -81,14 +81,18 @@ try:
         "Qty":(By.NAME, "NonCatQuantity"),
         "Price (USD)":(By.NAME, "NonCatUnitPrice")
     }
-
+    total_rows = df["Non-Catalog #"].count()
+    # print()
+    # print("Total Rows:", total_rows)
+    # print()
     for index, row in df.iterrows():
 
+        # print(index)
         for key, value in fill_in_data.items():
             elem = driver.find_element(*value)
             elem.send_keys(regex.sub('',str(row[key])))
 
-        if index == df["Non-Catalog #"].count():
+        if index == total_rows-1:
             button = driver.find_element_by_xpath("//input[@type='button' and @value='Save and Close']")
             button.click()
         else:
