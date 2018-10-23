@@ -3,10 +3,10 @@
 block_cipher = None
 
 
-a = Analysis(['weborder.py'],
+a = Analysis(['gatewayhelper.py'],
              pathex=['/Users/Zach/Documents/projects/gateway-non-catalog-helper'],
              binaries=[('ChromeDriver', '.')],
-             datas=[('Carts', 'Carts'), ('Carts/NonCatalogTemplate.xlsx', 'Carts')],
+             datas=[('ui_gatewayhelper.py', '.'), ('settings.json', '.')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -19,18 +19,18 @@ pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
+          a.binaries,
+          a.zipfiles,
+          a.datas,
           [],
-          exclude_binaries=True,
           name='MacOSX-GatewayHelper',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=True )
-coll = COLLECT(exe,
-               a.binaries,
-               a.zipfiles,
-               a.datas,
-               strip=False,
-               upx=True,
-               name='MacOSX-GatewayHelper')
+          runtime_tmpdir=None,
+          console=False , icon='icon.icns')
+app = BUNDLE(exe,
+             name='MacOSX-GatewayHelper.app',
+             icon='icon.icns',
+             bundle_identifier=None)
