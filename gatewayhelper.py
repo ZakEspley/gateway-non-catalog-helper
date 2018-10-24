@@ -34,7 +34,7 @@ class GatewayHelperApp(QMainWindow, Ui_MainWindow):
             self.tempPath = sys._MEIPASS
             self.application_path = os.path.dirname(sys.executable)
             self.resourcePath = os.path.join(self.application_path, "..", "Resources")
-            self.driverPath = os.path.join(self.tempPath, self.driver_exec)
+            self.driverPath = os.path.join(self.application_path, self.driver_exec)
         elif __file__:
             self.application_path = os.path.dirname(__file__)
             self.resourcePath = self.application_path
@@ -48,7 +48,7 @@ class GatewayHelperApp(QMainWindow, Ui_MainWindow):
             self.lastPath = os.path.expanduser("~/Documents")
         else:
             self.lastPath = self.settings["lastPath"]
-        
+
         self.browser = self.settings["browser"]
         self.icon = QIcon( os.path.join(self.resourcePath, "icon.icns") )
         self.cwd = os.getcwd()
