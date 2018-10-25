@@ -32,15 +32,17 @@ class GatewayHelperApp(QMainWindow, Ui_MainWindow):
         if ("windows" in platform.system().lower()):
             self.driver_exec = "chromedriver.exe"
             self.name = "GatewayHelper.exe"
+            self.iconName = "icon.ico"
         else:
             self.driver_exec = "chromedriver"
             self.name = "GatewayHelper.app"
+            self.iconName = "icon.icns"
 
         if getattr(sys, 'frozen', False):
             self.tempPath = sys._MEIPASS
             self.application_path = sys.executable
             if not os.path.exists(user_config_dir(self.appname, self.appauthor)):
-                os.mkdir(user_config_dir(self.appname, self.appauthor))
+                os.makedirs(user_config_dir(self.appname, self.appauthor))
             self.resourcePath = user_config_dir(self.appname, self.appauthor)    
             self.driverPath = os.path.join(self.tempPath, self.driver_exec)
         elif __file__:
@@ -49,6 +51,8 @@ class GatewayHelperApp(QMainWindow, Ui_MainWindow):
             self.tempPath = self.application_path
             self.driverPath = os.path.join(os.getcwd(), self.driver_exec)
         
+        self.icon = QIcon( os.path.join(self.tempPath, self.iconName) )
+
         try:
             with open(os.path.join(self.resourcePath, "settings.json")) as file:
                 self.settings = json.load(file)
@@ -63,7 +67,6 @@ class GatewayHelperApp(QMainWindow, Ui_MainWindow):
             self.lastPath = self.settings["lastPath"]
 
         self.browser = self.settings["browser"]
-        self.icon = QIcon( os.path.join(self.resourcePath, "icon.icns") )
         self.cwd = os.getcwd()
         self.filePath = None
         self.vendor = None
