@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QThread
 from ui_gatewayhelper import Ui_MainWindow
+from appdirs import user_config_dir
+from shutil import copy
 
 import pandas as pd
 from selenium import webdriver as wd
@@ -23,6 +25,10 @@ class GatewayHelperApp(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(GatewayHelperApp, self).__init__()
 
+        self.appname = "GatewayHelperApp"
+        self.appauthor = "GatewayHelper"
+        
+
         if ("windows" in platform.system().lower()):
             self.driver_exec = "chromedriver.exe"
             self.name = "GatewayHelper.exe"
@@ -32,17 +38,24 @@ class GatewayHelperApp(QMainWindow, Ui_MainWindow):
 
         if getattr(sys, 'frozen', False):
             self.tempPath = sys._MEIPASS
-            self.application_path = os.path.dirname(sys.executable)
-            self.resourcePath = os.path.join(self.application_path, "..", "Resources")
-            self.driverPath = os.path.join(self.application_path, self.driver_exec)
+            self.application_path = sys.executable
+            if not os.path.exists(user_config_dir(self.appname, self.appauthor)):
+                os.mkdir(user_config_dir(self.appname, self.appauthor))
+            self.resourcePath = user_config_dir(self.appname, self.appauthor)    
+            self.driverPath = os.path.join(self.tempPath, self.driver_exec)
         elif __file__:
             self.application_path = os.path.dirname(__file__)
             self.resourcePath = self.application_path
             self.tempPath = self.application_path
             self.driverPath = os.path.join(os.getcwd(), self.driver_exec)
-
-        with open(os.path.join(self.resourcePath, "settings.json")) as file:
-            self.settings = json.load(file)
+        
+        try:
+            with open(os.path.join(self.resourcePath, "settings.json")) as file:
+                self.settings = json.load(file)
+        except FileNotFoundError:
+            copy(os.path.join(self.tempPath, "settings.json"), self.resourcePath)
+            with open(os.path.join(self.resourcePath, "settings.json")) as file:
+                self.settings = json.load(file)
 
         if len(self.settings["lastPath"]) == 0:
             self.lastPath = os.path.expanduser("~/Documents")
@@ -120,7 +133,7 @@ class driverThread(QThread):
         try:
             self.df = pd.read_excel(self.filePath)
         except (FileNotFoundError, ValueError):
-            QMessageBox.warning(self.parent,'Cart Warning', 'You need to enter a proper file!')
+            QMessageBox.warning(self.parent, 'Cart Warning', 'You need to enter a proper file!')
             return None
         regex = re.compile('[$]')
 
@@ -172,6 +185,10 @@ class driverThread(QThread):
         
         except NoSuchWindowException:
             pass
+        
+        except KeyError:
+            QMessageBox.critical(self.parent, 'Cart Problem', "It looks like you aren't using the correct template. \r\n We can't find the write columns.")
+            self.quit()
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
