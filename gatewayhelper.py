@@ -146,8 +146,10 @@ class driverThread(QThread):
 
             self.driver.get(self.parent.gatewayLink)
 
-            wait = ui.WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.ID, "FormSkuSearchLink")))
-            link = self.driver.find_element_by_id("FormSkuSearchLink")
+            # wait = ui.WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.ID, "FormSkuSearchLink")))
+            # link = self.driver.find_element_by_id("FormSkuSearchLink")
+            wait = ui.WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.XPATH, '//a[@title="Non-Catalog Item"]')))
+            link = self.driver.find_element_by_xpath('//div[@class="phx phxText" and normalize-space(text())="Non-Catalog Item"]')
             link.click()
             ui.WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "ModalPopupIframe")))
             self.driver.switch_to.frame(self.driver.find_element_by_id("ModalPopupIframe"))
